@@ -48,6 +48,7 @@ var saveTasks = function () {
 
 
 
+
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function () {
     // clear values
@@ -91,7 +92,96 @@ $("#remove-tasks").on("click", function () {
     saveTasks();
 });
 
-// load tasks for the first time
-loadTasks();
+$(".list-group").on("click", "p", function () {
+    var text = $(this).text().trim();
+
+    var textInput = $("<textarea>")
+        .addClass("form-control")
+        .val(text);
+
+    $(this).replaceWith(textInput);
+
+    textInput.trigger("focus");
+});
 
 
+$(".list-group").on("blur", "textarea", function () {
+    //GET THE TEXTAREA CURRENT 'TEXT/VALUE'
+    var text = $(this)
+        .val()
+        .trim();
+
+    //GET THE PARENT UL'S ID ATTRIBUTE
+    var status = $(this)
+        .closet(".list-group")
+        .attr("id")
+        .replace("list-", "");
+
+    //GET THE TASK'S POSITION IN THE LIST OF OTHER 'li' ELEMENTS
+    var index = $(this)
+        .closet(".list-group-item")
+        .index();
+
+    tasks[status][index].text = text;
+    saveTasks();
+
+    //RECREATE 'p' ELEMENT
+    var taskP = $("<p>")
+        .addClass("m-1")
+        .text(text);
+
+    //REPLACE 'textarea' WITH 'p'
+    $(this).replaceWith(taskP);
+});
+
+//'due date' WAS CLICKED
+$(".list-group").on("click", "span", function () {
+    //GET CURRENT TEXT
+    var date = $(this)
+        .text()
+        .trim();
+
+    //CREATE NEW INPUT ELEMENT 
+    var dateInput = $("<input>")
+        .attr("type", "text")
+        .addClass("form-control")
+        .val(date);
+
+    //SWAP OUT ELEMENTS
+    $(this).replaceWith(dateInput);
+
+    //AUTOMATICALLY FOCUS ON NEW ELEMENT
+    dateInput.trigger("focus");
+
+});
+
+//VALUE OF DUE DATE WAS CHANGED
+$(".list-group").on("blur", "input[type='text']", function () {
+    //GET CURRENT TEXT
+    var date = $(this)
+        .val()
+        .trim();
+
+    //GET THE PARENT ul's ID ATTRIBUTE
+    var status = $(this)
+        .closet(".list-group")
+        .attr("id")
+        .replace("list-", "");
+
+    //GET THE 'task's' POSITION IN THE LIST OF OTHER 'li' ELEMENTS
+    var index = $(this)
+        .closet(".list-group-item")
+        .index();
+
+    //UPDATE TASK IN []ARRAY AND RE-SAVE TO 'localStorage"
+    tasks[status][index].date = date;
+    saveTasks();
+
+    //RECREATE SPAN ELEMENT WITH BOOSTRAP CLASSES
+    var taskSpan = $("<span>")
+        .addClass("badge badge-primary badge-pill")
+        .text(date);
+
+    //REPLACE INPUT WITH SPAN ELEMENT 
+    $(this).replaceWith(taskSpan);
+});
